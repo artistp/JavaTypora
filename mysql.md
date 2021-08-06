@@ -1601,3 +1601,46 @@ DataSourceTransactionManager， 将read-only的事务扔进读库， 其余的�
 
 可以支持事务，缺点：类内部方法通过this.xx()方式相互调用时，aop不会进行拦截，需进行特殊处理
 
+# 索引下推
+
+### 1. 定义
+
+- 索引下推（index condition pushdown ）简称ICP，在Mysql5.6的版本上推出，用于优化查询。
+- 在不使用ICP的情况下，在使用非主键索引（又叫普通索引或者二级索引）进行查询时，**存储引擎通过索引检索到数据，然后返回给MySQL服务器，服务器然后判断数据是否符合条件 。**
+- 在使用ICP的情况下，如果存在某些被索引的列的判断条件时，**MySQL服务器将这一部分判断条件传递给存储引擎，然后由存储引擎通过判断索引是否符合MySQL服务器传递的条件，只有当索引符合条件时才会将数据检索出来返回给MySQL服务器 。**
+- 索引条件下推优化可以减少存储引擎查询基础表的次数，也可以减少MySQL服务器从存储引擎接收数据的次数。
+
+### 2.适用场景
+
+- 当需要整表扫描，e.g.:range,ref,eq_ref....
+- 适用InnoDB引擎和MyISAM引擎查询（5.6版本不适用分区查询，5.7版本可以用于分区表查询）。
+- InnoDB引擎仅仅适用二级索引。（原因InnoDB聚簇索引将整行数据读到InnoDB缓冲区）。
+- 子查询条件不能下推。触发条件不能下推，调用存储过程条件不能下推。
+
+### 3.小示例
+
+- 当我们创建一个用户表(userinfo),其中有字段：id,name,age,addr。我们将name,age建立联合索引。
+
+  ```mysql
+  当我们执行：select * from userinfo where name like "ming%" and age=20;
+  ```
+
+- 对于MySQL5.6之前：我们在索引内部首先通过name进行查找，在联合索引name,age树形查询结果可能存在多个，然后再拿着id值去回表查询，整个过程需要回表多次。
+
+![img](/Users/heaven/Documents/Typora/mysql.assets/format,png.png)
+
+- 对于MySQL5.6之后：我们是在索引内部就判断age是否等于20，对于不等于20跳过。因此在联合索引name,age索引树只匹配一个记录，此时拿着这个id去主键索引树种回表查询全部数据，整个过程就回一次表。
+
+  ![img](/Users/heaven/Documents/Typora/mysql.assets/format1,png.png)
+
+![img](/Users/heaven/Documents/Typora/mysql.assets/1644171-20200402202607592-1674490046.png)
+
+- 当Extra值为：Using index condition.表示使用索引下推。
+
+- 通过索引下推对于非主键索引进行优化，可有效减少回表次数，从而提高效率。
+
+- 关闭索引下推命令
+
+  ```
+  set optimizer_switch='index_condition_pushdown=off';
+  ```
