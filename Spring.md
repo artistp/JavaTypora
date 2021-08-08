@@ -335,8 +335,6 @@ Spring会检测该对象是否实现了xxxAware接口，通过Aware类型的接�
 < bean id = "car3" factory-bean = "carFactory" factory-method = "createCar" ></ bean > 
 ```
 
-
-
 # AOP
 
 如何把切面织入到核心逻辑中？这正是AOP需要解决的问题。换句话说，如果客户端获得了`BookService`的引用，当调用`bookService.createBook()`时，如何对调用方法进行拦截，并在拦截前后进行安全检查、日志、事务等处理，就相当于完成了所有业务功能。
