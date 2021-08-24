@@ -1627,13 +1627,13 @@ DataSourceTransactionManager， 将read-only的事务扔进读库， 其余的�
 
 - 对于MySQL5.6之前：我们在索引内部首先通过name进行查找，在联合索引name,age树形查询结果可能存在多个，然后再拿着id值去回表查询，整个过程需要回表多次。
 
-![img](/Users/heaven/Documents/Typora/mysql.assets/format,png.png)
+![img](mysql.assets/format,png.png)
 
 - 对于MySQL5.6之后：我们是在索引内部就判断age是否等于20，对于不等于20跳过。因此在联合索引name,age索引树只匹配一个记录，此时拿着这个id去主键索引树种回表查询全部数据，整个过程就回一次表。
 
-  ![img](/Users/heaven/Documents/Typora/mysql.assets/format1,png.png)
+  ![img](mysql.assets/format1,png.png)
 
-![img](/Users/heaven/Documents/Typora/mysql.assets/1644171-20200402202607592-1674490046.png)
+![img](mysql.assets/1644171-20200402202607592-1674490046.png)
 
 - 当Extra值为：Using index condition.表示使用索引下推。
 
