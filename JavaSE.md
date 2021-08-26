@@ -143,7 +143,7 @@ Java中的网络支持：
 
 ![img](JavaSE.assets/1492928105791_3.png)
 
-![img](/Users/heaven/Documents/Typora/JavaSE.assets/modb_20210621_9bc76958-d298-11eb-adb8-38f9d3cd240d.png)
+![img](JavaSE.assets/modb_20210621_9bc76958-d298-11eb-adb8-38f9d3cd240d.png)
 
 <font color=red>**传统读操作**</font>
 
@@ -177,7 +177,7 @@ Java中的网络支持：
 
 用户态直接 I/O 使得应用进程或运行在用户态（user space）下的库函数直接访问硬件设备，数据直接跨过内核进行传输，内核在数据传输过程除了进行必要的虚拟存储配置工作之外，不参与任何其他工作，这种方式能够直接绕过内核，极大提高了性能。
 
-![img](/Users/heaven/Documents/Typora/JavaSE.assets/modb_20210621_9bf0e10c-d298-11eb-adb8-38f9d3cd240d.png)
+![img](JavaSE.assets/modb_20210621_9bf0e10c-d298-11eb-adb8-38f9d3cd240d.png)
 
 用户态直接 I/O 只能适用于不需要内核缓冲区处理的应用程序，这些应用程序通常在进程地址空间有自己的数据缓存机制，称为自缓存应用程序，如数据库管理系统就是一个代表。其次，这种零拷贝机制会直接操作磁盘 I/O，由于 CPU 和磁盘 I/O 之间的执行时间差距，会造成大量资源的浪费，解决方案是配合异步 I/O 使用。
 
@@ -192,7 +192,7 @@ write(socket_fd, tmp_buf, len);
 
 使用 mmap 的目的是将内核中读缓冲区（read buffer）的地址与用户空间的缓冲区（user buffer）进行映射，从而实现内核缓冲区与应用程序内存的共享，**省去了将数据从内核读缓冲区（read buffer）拷贝到用户缓冲区（user buffer）的过程**，然而内核读缓冲区（read buffer）仍需将数据拷贝到内核写缓冲区（socket buffer），大致的流程如下图所示：
 
-![img](/Users/heaven/Documents/Typora/JavaSE.assets/modb_20210621_9c1d3572-d298-11eb-adb8-38f9d3cd240d.png)
+![img](JavaSE.assets/modb_20210621_9c1d3572-d298-11eb-adb8-38f9d3cd240d.png)
 
 基于 mmap + write 系统调用的零拷贝方式，整个拷贝过程会发生 4 次上下文切换，1 次 CPU 拷贝和 2 次 DMA 拷贝
 
@@ -217,7 +217,7 @@ sendfile(socket_fd, file_fd, len);
 
 通过 sendfile 系统调用，数据可以直接在内核空间内部进行 I/O 传输，从而省去了数据在用户空间和内核空间之间的来回拷贝。与 mmap 内存映射方式不同的是， sendfile 调用中 I/O 数据对用户空间是完全不可见的。也就是说，这是一次完全意义上的数据传输过程。
 
-![img](/Users/heaven/Documents/Typora/JavaSE.assets/modb_20210621_9c5dd9c4-d298-11eb-adb8-38f9d3cd240d.png)
+![img](JavaSE.assets/modb_20210621_9c5dd9c4-d298-11eb-adb8-38f9d3cd240d.png)
 
 基于 sendfile 系统调用的零拷贝方式，整个拷贝过程会发生 2 次上下文切换，1 次 CPU 拷贝和 2 次 DMA 拷贝
 
@@ -231,7 +231,7 @@ sendfile(socket_fd, file_fd, len);
 
 Linux 2.4 版本的内核对 sendfile 系统调用进行修改，为 DMA 拷贝引入了 gather 操作。它将内核空间（kernel space）的读缓冲区（read buffer）中对应的数据描述信息（内存地址、地址偏移量）记录到相应的网络缓冲区（ socket buffer）中，由 DMA 根据内存地址、地址偏移量将数据批量地从读缓冲区（read buffer）拷贝到网卡设备中，这样就省去了内核空间中仅剩的 1 次 CPU 拷贝操作
 
-![img](/Users/heaven/Documents/Typora/JavaSE.assets/modb_20210621_9c840838-d298-11eb-adb8-38f9d3cd240d.png)
+![img](JavaSE.assets/modb_20210621_9c840838-d298-11eb-adb8-38f9d3cd240d.png)
 
 基于 sendfile + DMA gather copy 系统调用的零拷贝方式，整个拷贝过程会发生 2 次上下文切换、0 次 CPU 拷贝以及 2 次 DMA 拷贝
 
@@ -253,7 +253,7 @@ splice(fd_in, off_in, fd_out, off_out, len, flags);
 
 splice 系统调用可以在内核空间的读缓冲区（read buffer）和网络缓冲区（socket buffer）之间建立管道（pipeline），从而避免了两者之间的 CPU 拷贝操作
 
-![img](/Users/heaven/Documents/Typora/JavaSE.assets/modb_20210621_9cbd318a-d298-11eb-adb8-38f9d3cd240d.png)
+![img](JavaSE.assets/modb_20210621_9cbd318a-d298-11eb-adb8-38f9d3cd240d.png)
 
 1. 用户进程通过 splice() 函数向内核（kernel）发起系统调用，上下文从用户态（user space）切换为内核态（kernel space）。
 2. CPU 利用 DMA 控制器将数据从主存或硬盘拷贝到内核空间（kernel space）的读缓冲区（read buffer）。
@@ -457,7 +457,7 @@ public class NIOClient {
 
 mmap是一种内存映射文件的方法，即将一个文件或者其它对象映射到进程的地址空间，实现文件磁盘地址和进程虚拟地址空间中一段虚拟地址的一一对映关系。
 
-![img](/Users/heaven/Documents/Typora/JavaSE.assets/200501092691998.png)
+![img](JavaSE.assets/200501092691998.png)
 
 mmap内存映射原理：
 
