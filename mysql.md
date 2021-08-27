@@ -163,14 +163,10 @@ MYSQL引擎在物理文件上的区别
 	- *.frm
 	- *.ibd
 
-![image-20210525194853703](E:\TyporaImg\image-20210525194853703.png)
-
 - MYISAM  对应文件
 	- *.frm  ----表结构文件
 	- *.MYD  -----数据文件
 	- *.MYI   ----索引文件
-
-![image-20210525194637114](E:\TyporaImg\image-20210525194637114.png)
 
 > 设置数据库的字符集编码
 
@@ -634,7 +630,7 @@ InnoDB实现回滚，靠的是undo log：当事务对数据库进行修改时，
 
 ### <font color=red>**事务隔离级别**</font>
 
-![image-20210717140830636](mysql.assets/image-20210717140830636.png)
+![img](mysql.assets/image-20210717140830636.png)
 
 ## 持久性（Durability）:
 
@@ -644,7 +640,7 @@ InnoDB实现回滚，靠的是undo log：当事务对数据库进行修改时，
 
 
 
-![image-20210717105608247](mysql.assets/image-20210717105608247.png)
+![img](mysql.assets/image-20210717105608247.png)
 
 如上图所示，MySQL服务器逻辑架构从上往下可以分为三层：
 
@@ -1495,19 +1491,19 @@ trx_sys中的主要内容，以及判断可见性的方法如下：
 
 1）脏读
 
-![image-20210717141755321](mysql.assets/image-20210717141755321.png)
+![img](mysql.assets/image-20210717141755321.png)
 
 ​	当事务A在T3时刻读取zhangsan的余额前，会生成ReadView，**由于此时事务B没有提交仍然活跃，因此其事务id一定在ReadView的rw_trx_ids中**，因此根据前面介绍的规则，事务B的修改对ReadView不可见。接下来，事务A根据指针指向的undo log查询上一版本的数据，得到zhangsan的余额为100。这样事务A就避免了脏读。
 
 2）不可重复读
 
-![image-20210717142444257](mysql.assets/image-20210717142444257.png)
+![img](mysql.assets/image-20210717142444257.png)
 
 ​		当事务A在T2时刻读取zhangsan的余额前，会生成ReadView。**此时事务B分两种情况讨论，一种是如图中所示，事务已经开始但没有提交，此时其事务id在ReadView的rw_trx_ids中；一种是事务B还没有开始，此时其事务id大于等于ReadView的low_limit_id。**无论是哪种情况，根据前面介绍的规则，事务B的修改对ReadView都不可见。当事务A在T5时刻再次读取zhangsan的余额时，会根据T2时刻生成的ReadView对数据的可见性进行判断，从而判断出事务B的修改不可见；因此事务A根据指针指向的undo log查询上一版本的数据，得到zhangsan的余额为100，从而避免了不可重复读。
 
 3）幻读
 
-![image-20210717142905718](mysql.assets/image-20210717142905718.png)
+![img](mysql.assets/image-20210717142905718.png)
 
 ​		当事务A在T2时刻读取0<id<5的用户余额前，会生成ReadView。此时事务B分两种情况讨论，一种是如图中所示，事务已经开始但没有提交，此时其事务id在ReadView的rw_trx_ids中；一种是事务B还没有开始，此时其事务id大于等于ReadView的low_limit_id。无论是哪种情况，根据前面介绍的规则，事务B的修改对ReadView都不可见。
 
@@ -1535,7 +1531,7 @@ delete from table where ?;
 
 **双写机制**：在InnoDB将BP中的Dirty Page刷（flush）到磁盘上时，首先会将（memcpy函数）Page刷到InnoDB tablespace的一个区域中，我们称该区域为Double write Buffer。在向Double write Buffer写入成功后，第二步、再将数据分别刷到一个共享空间和真正应该存在的位置。**所以当操作系统或者数据库进程在数据页写磁盘的过程中崩溃，Innodb可以在doublewrite缓存中找到数据页的备份而用来执行crash恢复。 ** **数据页写入到doublewrite缓存的动作所需要的IO消耗要小于写入到数据文件的消耗，因为此写入操作会以一次大的连续块的方式写入**
 
-![image-20210717104025053](mysql.assets/image-20210717104025053.png)
+![img](mysql.assets/image-20210717104025053.png)
 
 **自适应哈希**：Adaptive Hash index属性使得InnoDB更像是内存数据库。Innodb存储引擎会监控对表上**二级索引**的查找，如果发现某二级索引被频繁访问，二级索引成为热数据，建立哈希索引可以带来速度的提升。经常访问的二级索引数据会自动被生成到hash索引里面去(最近连续被访问三次的数据)，自适应哈希索引通过缓冲池的B+树构造而来，因此建立的速度很快。
 

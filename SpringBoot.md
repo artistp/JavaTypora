@@ -10,7 +10,7 @@
 
 Spring在简化：SpringBoot-jar：内嵌tomcat
 
-![image-20210610090957145](SpringBoot.assets/image-20210610090957145.png)
+![img](SpringBoot.assets/image-20210610090957145.png)
 
 # **SpringBoot原理：**
 
@@ -178,7 +178,7 @@ private Resource getIndexHtml(Resource location) {
 
 ## 模板引擎
 
-![image-20210613163214854](SpringBoot.assets/image-20210613163214854.png)
+![img](SpringBoot.assets/image-20210613163214854.png)
 
 模板引擎的作用就是我们来写一个页面模板，比如有些值呢，是动态的，我们写一些表达式。而这些值，从哪来呢，我们来组装一些数据，我们把及些数据找到。然后把这个模板和这个数据交给我们模板引擎，模板引擎按照我们这个数据帮你把这个表达式解析、填充到我们指定的位置，然后把这个数据最终生成一个我们想要的内容给我们写出去，这就是模板引擎，不管是jsp还是其他模板引擎，都是这个思想。只不过呢，就是说不同模板引擎之间，他们可能这个语法有点不一样。SpringBoot给我们推荐的Thymeleaf模板引擎，这模板引擎呢，是一个高级语言的模板引擎，他的这个语法更简单。而且呢，功能更强大。
 
@@ -366,7 +366,7 @@ hasRole方法：与上面相同
 
 ## 2 功能
 
-![image-20210621091148849](SpringBoot.assets/image-20210621091148849.png)
+![img](SpringBoot.assets/image-20210621091148849.png)
 
 - Authentication:身份认证、登录，验证用户是不是拥有相应的身份;
 
@@ -392,7 +392,7 @@ hasRole方法：与上面相同
 
 ## 3 shiro架构（外部）
 
-![image-20210621091548998](SpringBoot.assets/image-20210621091548998.png)
+![img](SpringBoot.assets/image-20210621091548998.png)
 
 - subject: 应用代码直接交互的对象是Subject，也就是说Shiro的对外API核心就是Subject，Subject代表了当前的用户，这个用户不一定是一个具体的人，与当前应用交互的任何东西都是Subject，如网络爬虫，机器人等，**与Subject的所有交互都会委托给SecurityManager; Subject其实是一个门面，SecurityManageer才是实际的执行者**
 - SecurityManager: 安全管理器，即所有与安全有关的操作都会与SercurityManager交互，并且**它管理着所有的Subject**，可以看出它是Shiro的核心，**它负责与Shiro的其他组件进行交互**，它相当于SpringMVC的DispatcherServlet的角色
@@ -414,7 +414,7 @@ hasRole方法：与上面相同
 
 ### Realm
 
-![preview](https://pic2.zhimg.com/v2-2295b1d47bfa3dd1948d6344d4de7ab5_r.jpg)
+![img](https://pic2.zhimg.com/v2-2295b1d47bfa3dd1948d6344d4de7ab5_r.jpg)
 
 - **org.apache.shiro.realm.text.IniRealm**：[users] 部分指定用户名 / 密码及其角色；[roles] 部分指定角色即权限信息；
 - **org.apache.shiro.realm.text.PropertiesRealm**： user.username=password,role1,role2 指定用户名 / 密码及其角色；role.role1=permission1,permission2 指定角色及权限信息；
@@ -461,7 +461,7 @@ Authenticator 的职责是验证用户帐号，是 Shiro API 中身份验证核�
 
 ## 4 shiro架构（内部）
 
-![image-20210621091900355](SpringBoot.assets/image-20210621091900355.png)
+![img](SpringBoot.assets/image-20210621091900355.png)
 
 
 
@@ -548,21 +548,21 @@ lettuce :采用netty，实例可以再多个线程中进行共享，不存在线
 
 # 分布式 Dubbo
 
-![image-20210621163803016](SpringBoot.assets/image-20210621163803016.png)
+![img](SpringBoot.assets/image-20210621163803016.png)
 
 ## RPC
 
 RPC【Remote Procedure Call】是指**远程过程调用**，是一种**进程间通信方式**，他是一种技术的思想，而不是规范。它允许程序调用另一个地址空间〈通常是共享网络的另一台机器上)的过程或函数，而不用程序员显式编码这个远程调用的细节。即程序员无论是调用本地的还是远程的函数，本质上编写的调用代码基本相同。**核心模块：通讯、序列化**
 
-![image-20210621164250402](SpringBoot.assets/image-20210621164250402.png)
+![img](SpringBoot.assets/image-20210621164250402.png)
 
-![image-20210621164314074](SpringBoot.assets/image-20210621164314074.png)
+![img](SpringBoot.assets/image-20210621164314074.png)
 
 ## Dubbo
 
 Apache Dubbo 是一款高性能、轻量级的开源Java RPC框架，它提供了三大核心能力:**面向接口的远程方法调用**，**智能容错**和**负载均衡**，以及**服务自动注册和发现。**
 
-![image-20210621164843586](SpringBoot.assets/image-20210621164843586.png)
+![img](SpringBoot.assets/image-20210621164843586.png)
 
 - 服务提供者(Provider)∶暴露服务的服务提供方，服务提供者在启动时，向注册中心注册自己提供的服务。
 - 服务消费者（Consumer）:调用远程服务的服务消费方，服务消费者在启动时，向注册中心订阅自己所需的服务，服务消费者，从提供者地址列表中，基于软负载均衡算法，选一台提供者进行调用，如果调用失败，再选另一台调用。

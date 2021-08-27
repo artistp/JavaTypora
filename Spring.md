@@ -264,9 +264,9 @@ FactoryBean为我们实例化Bean提供了一个更为灵活的方式，我们�
 
 ## Bean的生命周期
 
-![image-20210730083201477](Spring.assets/image-20210730083201477.png)
+![img](Spring.assets/image-20210730083201477.png)
 
-![image-20210730083214956](Spring.assets/image-20210730083214956.png)
+![img](Spring.assets/image-20210730083214956.png)
 
 1. **实例化bean**
 

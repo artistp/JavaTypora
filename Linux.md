@@ -54,9 +54,9 @@ halt #关闭系统，等同于shutdown -h now和 poweroff
 ls /
 ```
 
-![image-20210621200726106](Linux.assets/image-20210621200726106.png)
+![img](Linux.assets/image-20210621200726106.png)
 
-![image-20210621200755375](Linux.assets/image-20210621200755375.png)
+![img](Linux.assets/image-20210621200755375.png)
 
 - /bin : bin是Binary的缩写,这个目录存放着最经常使用的命令。
 - /boot:这里存放的是启动Linux时使用的一些核心文件，包括一些连接文件以及镜像文件。
@@ -147,7 +147,7 @@ mv 旧文件名 新文件名 #更改文件名
 
 接下来的字符中，以三个为一组，且均为『rwx』的三个参数的组合。其中，[r]代表可读(read)、[ w ]代表可写(write)、[×]代表可执行(execute)。没有权限的情况下由【-】代替
 
-![image-20210621205138703](Linux.assets/image-20210621205138703.png)
+![img](Linux.assets/image-20210621205138703.png)
 
 > 修改文件属性
 
@@ -268,7 +268,7 @@ ESC: 回到命令模式
 
 **底线命令模式**
 
-**![image-20210621212822287](Linux.assets/image-20210621212822287.png)**
+![img](Linux.assets/image-20210621212822287.png)**
 
 # 账号管理
 
@@ -291,9 +291,9 @@ passwd -l 用户名 #冻结用户
 passwd -d 用户名 #没有密码的用户也不能登录
 ```
 
-![image-20210621213928178](Linux.assets/image-20210621213928178.png)
+![img](Linux.assets/image-20210621213928178.png)
 
-![image-20210621214037192](Linux.assets/image-20210621214037192.png)
+![img](Linux.assets/image-20210621214037192.png)
 
 # 用户组管理
 
@@ -364,7 +364,7 @@ kill -9 进程ID #强行结束进程
 
 # 免密码登录
 
-![image-20210812110610585](Linux.assets/image-20210812110610585.png)
+![img](Linux.assets/image-20210812110610585.png)
 
 主机200免密码登录201，将200的公钥放到201中
 
