@@ -115,7 +115,9 @@ Redis ( **Re**mote **Di**ctionary **S**erver )，即**远程字典服务**!是�
 
 ![img](Redis.assets/image-20210622140324487.png)
 
- 性能测试
+![image-20211117165229832](Redis.assets/image-20211117165229832.png) 
+
+性能测试
 
 ```shell
 redis-benchmark -h localhost -p 6379 -c 100 -n 100000 #测试100个并发连接，每个连接10W个请求

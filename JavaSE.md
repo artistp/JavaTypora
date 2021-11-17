@@ -541,11 +541,17 @@ poll 没有最大描述符数量的限制，如果平台支持并且对实时性
 - 服务端**每个线程不仅要进行IO读写操作，而且还需要进行业务计算**；
 - 服务端在获取客户端连接，读取数据，以及写入数据的过程都是**阻塞类型的**，在网络状况不好的情况下，这将极大的降低服务器每个线程的利用率，从而降低服务器吞吐量
 
-**Reactor事件驱动模型**
+**Reactor单线程模型**
+
+Reactor模式，即工作线程要自己从socket上读写数据。
+
+Proactor事件处理模式，即由主线程来完成数据的读写操作，此时主线程将应用程序数据、任务类型等信息封装为一个任务对象，然后将其插入到请求队列。
 
 在传统IO模型中，由于线程在等待连接以及进行IO操作时都会阻塞当前线程，这部分损耗是非常大的。因而jdk 1.4中就提供了一套非阻塞IO的API。该API本质上是以**事件驱动来处理网络事件**的，而**Reactor是基于该API提出的一套IO模型**。如下是Reactor事件驱动模型的示意图：
 
 ![img](JavaSE.assets/java-io-reactor-2.png)
+
+**Reactor单线程模型中，NIO线程的职责为：接收请求（发起请求） ，收发通信对端的消息。**
 
 在Reactor模型中，主要有四个角色：**客户端连接，Reactor，Acceptor和Handler**。这里**Acceptor会不断地接收客户端的连接，然后将接收到的连接交由Reactor进行分发，最后有具体的Handler进行处理**。改进后的Reactor模型相对于传统的IO模型主要有如下优点：
 
@@ -554,7 +560,7 @@ poll 没有最大描述符数量的限制，如果平台支持并且对实时性
 
 -------------------
 
-**Reactor事件驱动模型---业务处理与IO分离**
+**Reactor多线程模型**
 
 在上面的Reactor模型中，由于网络读写和业务操作都在同一个线程中，在高并发情况下，这里的系统瓶颈主要在两方面：
 
@@ -565,6 +571,8 @@ poll 没有最大描述符数量的限制，如果平台支持并且对实时性
 
 ![img](JavaSE.assets/java-io-reactor-3.png)
 
+**Reactor多线程模型中，一个专门的NIO线程（acceptor）接收连接，网络IO读写由一个NIO线程池负责，由这些NIO线程负责消息的读取、解码、编码和发送**
+
 - 使用**一个线程进行客户端连接的接收以及网络读写事件的处理**；
 - 在接收到客户端连接之后，将该连接交由线程池进行数据的编解码以及业务计算。
 
@@ -574,13 +582,13 @@ poll 没有最大描述符数量的限制，如果平台支持并且对实时性
 
 --------------------------------
 
-**Reactor事件驱动模型---并发读写**
+**Reactor主从Reactor模型**
 
 对于使用线程池处理业务操作的模型，由于网络读写在高并发情况下会成为系统的一个瓶颈，因而针对该模型这里提出了一种改进后的模型，即使用线程池进行网络读写，而仅仅只使用一个线程专门接收客户端连接。
 
 ![img](JavaSE.assets/java-io-reactor-4.png)
 
-改进后的Reactor模型将Reactor拆分为了mainReactor和subReactor。这里**mainReactor主要进行客户端连接的处理**，处理完成之后将**该连接交由subReactor以处理客户端的网络读写**。这里的**subReactor则是使用一个线程池来支撑的**，其读写能力将会随着线程数的增多而大大增加。对于业务操作，这里也是使用一个线程池，而每个业务请求都只需要进行编解码和业务计算。通过这种方式，服务器的性能将会大大提升，在可见情况下，其基本上可以支持百万连接。
+改进后的Reactor模型将Reactor拆分为了mainReactor和subReactor。这里**mainReactor主要进行客户端连接的处理**，处理完成之后将**该连接（SocketChannel）交由subReactor以处理客户端的网络读写**。这里的**subReactor则是使用一个线程池来支撑的**，其读写能力将会随着线程数的增多而大大增加。对于业务操作，这里也是使用一个线程池，而每个业务请求都只需要进行编解码和业务计算。通过这种方式，服务器的性能将会大大提升，在可见情况下，其基本上可以支持百万连接。
 
 <font color=red>**Java对多路复用的支持**</font>
 
@@ -628,3 +636,66 @@ Selector的英文含义是“选择器”，不过根据我们详细介绍的Sel
 
 
 
+## epoll
+
+![image-20210906101927937](JavaSE.assets/image-20210906101927937.png)
+
+```c++
+int epoll_create(int size);
+```
+
+**epoll_create**: 创建一个epoll句柄，参数size用于告诉内核监听的文件描述符个数，跟内存大小有关。 返回epoll 文件描述符
+
+- wait_queue_head_t: 任务等待队列。双向循环链表，如果有10个线程在调用epoll_waite等待事件发生, 存的是这10个待唤醒的进程及回调函数。
+- rdllist: 就绪的列表。会将已经有**事件就绪的文件描述符及相应的事件**封装在events里面返回给调用epoll_wait的线程。
+- rbr: 红黑树，如果epoll需要监听100W个链接，那这个红黑树就是存的这100W个socket的epitem，当有事件发生时，就会把红黑树中的对应的节点拷贝到rdllist中，也就是events里面
+
+```c++
+int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event ); // 成功，返0，失败返-1
+```
+
+**epoll_ctl**: 控制某个epoll监控的文件描述符上的事件：注册，修改，删除
+
+- epfd：为epoll的句柄 
+- op:表示动作，用3个宏来表示 ··· EPOLL_CTL_ADD（注册新的 fd 到epfd） ··· EPOLL_CTL_DEL（从 epfd 中删除一个 fd） ··· EPOLL_CTL_MOD（修改已经注册的 fd 监听事件）
+- event：告诉内核需要监听的事件
+
+```c++
+typedef union epoll_data
+{
+    void* ptr;
+    int fd;
+    __uint32_t u32;
+    __uint64_t u64;
+} epoll_data_t;  /* 保存触发事件的某个文件描述符相关的数据 */
+
+struct epoll_event
+{
+    __uint32_t events;  /* epoll event */
+    epoll_data_t data;  /* User data variable */
+};
+```
+
+> epoll_event.events:
+>   EPOLLIN  表示对应的文件描述符可以读
+>   EPOLLOUT 表示对应的文件描述符可以写
+>   EPOLLPRI 表示对应的文件描述符有紧急的数据可读
+>   EPOLLERR 表示对应的文件描述符发生错误
+>   EPOLLHUP 表示对应的文件描述符被挂断
+>   EPOLLET  表示对应的文件描述符有事件发生
+
+- epitem.event: 事件，知道这个fd上会发生什么
+- epitem.pwqlist:等待队列，需要知道要回调什么东西
+- epitem.ffd: 将file指针和socket的fd包装在一起用户红黑树比较大小，保证有序。
+
+```c++
+int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout);
+```
+
+**epoll_wait**: 等待所监控文件描述符上有事件的产生
+
+- events：用来从内核得到事件的集合 
+- maxevent：用于告诉内核这个event有多大，这个maxevent不能大于创建句柄时的size 
+- timeout：超时时间 ··· -1：阻塞 ··· 0：立即返回 ···>0：指定微秒
+
+成功返回有多少个文件描述符准备就绪，时间到返回0，出错返回-1.
